@@ -2,11 +2,23 @@ import tensorflow as tf
 import keras
 import main_variables as MV
 import numpy as np
+import requests
 
-dataset_manager_port = 5001
-url_dataset_manager = f"http://localhost:{dataset_manager_port}/"
+def get_dataset():
+    images = []
+    outputs = []
 
-np.random.seed(42)
+    dataset_manager_port = 5001
+    url_dataset_manager = f"http://dataset_manager:{dataset_manager_port}/"
+    dataset_response = requests.get(url_dataset_manager)
+    dataset_response.raise_for_status()
+    dataset_json = dataset_response.json()
+    print(dataset_json)
+    images.append(dataset_json.image)
+    outputs.append(dataset_json.output)
+    return images, outputs
+
+np.random.seed(52)
 
 path_to_model = 'model.h5'
 

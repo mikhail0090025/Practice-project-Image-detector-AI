@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Recognition</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #fff;
+      font-family: 'Arial Black', sans-serif;
+    }
+
+    .navbar {
+            background: linear-gradient(to right, #2600ff, #040041);
+        }
+
+    .logo-img {
+      width: 55px;
+      height: 55px;
+    }
+
+    .image-preview {
+      width: 600px;
+      height: 350px;
+      background: lightgray;
+      margin: auto;
+    }
+
+    .label {
+      padding: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: black;
+      min-width: 150px;
+      text-align: center;
+    }
+
+    .ai-label {
+      background: lime;
+    }
+
+    .human-label {
+      background: #5533ff;
+      color: black;
+    }
+
+    .recognise-button {
+      margin-top: 20px;
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      background: lime;
+      border: none;
+      border-radius: 30px;
+    }
+
+    .file-input {
+      padding: 15px 20px;
+      border-radius: 30px;
+      background: #ddd;
+      font-size: 16px;
+      width: 100%;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="T_Vision_logo-GREEN-BLACK.png" alt="Bootstrap" width="55" height="55">
+      </a>
+      <button type="button" class="btn" style="border-radius: 50px; background-color: #00F148; color: black;" onclick="window.location.href='main_page.html'">Back</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-5">
+    <div class="row align-items-center justify-content-between">
+      <div class="col-md-7">
+        <div class="image-preview"></div>
+      </div>
+      <div class="col-md-5 text-center">
+        <h4 class="mb-4">THE IMAGE IS:</h4>
+        <div class="d-flex justify-content-center gap-3">
+          <!-- <div class="label ai-label">MADE BY AI</div>
+          <div class="label human-label">MADE BY HUMAN</div> -->
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <div class="row">
+        <div class="col-md-6">
+          <input type="file" class="file-input mb-3" accept="image/*">
+        </div>
+        <div class="col-md-6">
+          <input type="text" class="file-input mb-3" placeholder="Enter image URL">
+        </div>
+      </div>
+      <br>
+      <button class="recognise-button">RECOGNISE</button>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (optional, for interactive components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
