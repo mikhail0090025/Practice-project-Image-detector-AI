@@ -3,6 +3,9 @@ import keras
 import main_variables as MV
 import numpy as np
 
+dataset_manager_port = 5001
+url_dataset_manager = f"http://localhost:{dataset_manager_port}/"
+
 np.random.seed(42)
 
 path_to_model = 'model.h5'
