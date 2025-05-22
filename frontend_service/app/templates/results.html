@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты нейронной сети</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Результаты нейронной сети</h1>
+    {% if data.error %}
+        <p style="color: red;">Ошибка: {{ data.error }}</p>
+    {% else %}
+        <pre>{{ data | tojson | safe }}</pre>
+    {% endif %}
+    <a href="/">Назад на главную</a>
+</body>
+</html>

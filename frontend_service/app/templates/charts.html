@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Графики обучения</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Графики обучения</h1>
+    {% if chart_data.error %}
+        <p style="color: red;">Ошибка: {{ chart_data.error }}</p>
+    {% else %}
+        <canvas id="trainingChart" width="400" height="200"></canvas>
+        <script>
+            const ctx = document.getElementById('trainingChart').getContext('2d');
+            new Chart(ctx, {{ chart_data | tojson | safe }});
+        </script>
+    {% endif %}
+    <a href="/">Назад на главную</a>
+</body>
+</html>
