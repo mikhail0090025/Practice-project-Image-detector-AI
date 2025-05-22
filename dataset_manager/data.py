@@ -130,7 +130,7 @@ def load_image(dataset_path, image_index):
 
 dataset_paths = []
 
-def add_dataset_path(dataset_path):
+def add_dataset_path(dataset_path, indicator):
     """
     Adds dataset to global list dataset_paths.
 
@@ -138,17 +138,19 @@ def add_dataset_path(dataset_path):
     -----------
     dataset_path : str
         Path to dataset folder, example: .datasets/datasetX/ai
+    indicator : int
+        indicates if photo is ai generated or real, 1 - ai, 0 - real
     """
-    dataset_paths.append(dataset_path)
+    dataset_paths.append((dataset_path, indicator))
 
 def get_dataset_paths():
     """
-    Returns all paths to dataset
+    Returns all paths to dataset with their indicators
 
     Returns:
     -----------
     list
-        List of registered dataset paths
+        List of registered dataset paths and their indicators, 1 - ai, 0 - real
     """
     return dataset_paths
 
@@ -221,14 +223,14 @@ def main():
     """
     - ВАЖНО ДЛЯ ЛОГИКИ (скорее всего стоит засунуть в отдельную функцию с инициализацией)
     """
-    add_dataset_path("./datasets/dataset1/ai")
-    add_dataset_path("./datasets/dataset1/real")
-    add_dataset_path("./datasets/dataset2/ai")
-    add_dataset_path("./datasets/dataset2/real")
+    add_dataset_path("./datasets/dataset1/ai", 1)
+    add_dataset_path("./datasets/dataset1/real", 0)
+    add_dataset_path("./datasets/dataset2/ai", 1)
+    add_dataset_path("./datasets/dataset2/real", 0)
 
     """
     - пример использования get_dataset_paths & get_dataset_files
-    - load_image(get_dataset_paths()[0], int(get_dataset_files(get_dataset_paths()[0])[0]))
+    - load_image(get_dataset_paths()[0][0], int(get_dataset_files(get_dataset_paths()[0][0])[0]))
     - вернет самую первую фотку по самому первому пути в dataset_paths
     """
     #print(get_dataset_paths())
@@ -236,5 +238,7 @@ def main():
     #print(load_image(get_dataset_paths()[0]), int(get_dataset_files(get_dataset_paths()[0])[0]))
     #print(load_image("./datasets/dataset1/real", 1))
     #print(load_image(get_dataset_paths()[0], int(get_dataset_files(get_dataset_paths()[0])[0])))
+
+    #print(load_image(get_dataset_paths()[0][0], int(get_dataset_files(get_dataset_paths()[0][0])[0])))
 
 main()
