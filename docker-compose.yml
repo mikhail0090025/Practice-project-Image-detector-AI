@@ -1,0 +1,28 @@
+services:
+  dataset_manager:
+    build:
+      context: .
+      dockerfile: dataset_manager/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - PYTHONUNBUFFERED=1
+    networks:
+      - app-network
+
+  neural_net:
+    build:
+      context: .
+      dockerfile: neural_net/Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - PYTHONUNBUFFERED=1
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
