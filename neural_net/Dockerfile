@@ -9,8 +9,7 @@ RUN tree
 COPY . .
 EXPOSE 5001
 
-RUN useradd app
-USER app
+USER root
 
 # CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5001"]
 CMD python neural_net_manager.py

@@ -103,7 +103,7 @@ def load_image(dataset_path, image_index):
 
     category = os.path.basename(dataset_path).lower()
     if category not in ['real', 'ai']:
-        raise ValueError(f"Forled {dataset_path} must be real or ai")
+        raise ValueError(f"Folder {dataset_path} must be real or ai")
 
     extensions = ['.png', '.jpg', '.jpeg']
     
@@ -206,19 +206,19 @@ def main():
     """
     print("otsos")
 
-    #target_directory = "./datasets/dataset1"
-    #download_dataset("cashbowman/ai-generated-images-vs-real-images", target_directory)
-    #rename_images_in_folder("./datasets/dataset1/ai")
-    #rename_images_in_folder("./datasets/dataset1/real")
-    #print(load_image("./datasets/dataset1", 1, "real"))
-    #print(load_image("./datasets/dataset1", 1, "ai"))
+    # target_directory = "./datasets/dataset1"
+    # download_dataset("cashbowman/ai-generated-images-vs-real-images", target_directory)
+    # rename_images_in_folder("./datasets/dataset1/ai")
+    # rename_images_in_folder("./datasets/dataset1/real")
+    # print(load_image("./datasets/dataset1/ai", 1))
+    # print(load_image("./datasets/dataset1/real", 1))
     
-    #target_directory = "./datasets/dataset2"
-    #download_dataset("rafsunahmad/camera-photos-vs-ai-generated-photos-classifier", target_directory)
-    #rename_images_in_folder("./datasets/dataset2/ai")
-    #rename_images_in_folder("./datasets/dataset2/real")
-    #print(load_image("./datasets/dataset2", 1, "real"))
-    #print(load_image("./datasets/dataset2", 1, "ai"))
+    target_directory = "./datasets/dataset2"
+    download_dataset("rafsunahmad/camera-photos-vs-ai-generated-photos-classifier", target_directory)
+    rename_images_in_folder("./datasets/dataset2/ai")
+    rename_images_in_folder("./datasets/dataset2/real")
+    print(load_image("./datasets/dataset2/ai", 1))
+    print(load_image("./datasets/dataset2/real", 1))
 
     """
     - ВАЖНО ДЛЯ ЛОГИКИ (скорее всего стоит засунуть в отдельную функцию с инициализацией)

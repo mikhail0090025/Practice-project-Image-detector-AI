@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 import numpy as np
 from PIL import Image
 import os
-from data import load_image, get_dataset_paths, get_dataset_files
+from dataset_manager.data import load_image, get_dataset_paths, get_dataset_files
 
 app = FastAPI()
 

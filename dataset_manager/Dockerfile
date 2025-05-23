@@ -8,8 +8,7 @@ RUN tree
 COPY . .
 EXPOSE 5000
 
-RUN useradd app
-USER app
+USER root
 
 # CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
 CMD uvicorn dataset_manager.app.main:app --host 0.0.0.0 --port 5000
