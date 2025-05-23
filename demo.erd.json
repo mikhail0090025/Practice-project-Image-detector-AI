@@ -4,8 +4,8 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": -6.5843,
-    "scrollLeft": -6.1729,
+    "scrollTop": -15.2808,
+    "scrollLeft": -9.8893,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -107,7 +107,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1747896937890,
+          "updateAt": 1747903233546,
           "createAt": 1747895624846
         }
       },
@@ -132,7 +132,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1747896945524,
+          "updateAt": 1747903067231,
           "createAt": 1747896854656
         }
       }
@@ -321,20 +321,20 @@
       "t3vVMLQECG6gDrfg_wb06": {
         "id": "t3vVMLQECG6gDrfg_wb06",
         "tableId": "RJw8ARtzwyvZAluKqQ4t_",
-        "name": "ai_generated",
+        "name": "ai_percent",
         "comment": "",
-        "dataType": "BOOLEAN",
+        "dataType": "TINYINT",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 70,
+          "widthName": 60,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1747895705724,
+          "updateAt": 1747903272581,
           "createAt": 1747895663971
         }
       },
