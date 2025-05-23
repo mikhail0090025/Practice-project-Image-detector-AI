@@ -1,8 +1,10 @@
-FROM python:3.12
+FROM python:3.9-slim
 WORKDIR /usr/local/app
 
 COPY requirements.txt ./
-RUN pip install --upgrade pip setuptools && apt-get update && apt-get install -y gcc python3-dev && pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install tree
+RUN tree
 
 COPY . .
 EXPOSE 5001
