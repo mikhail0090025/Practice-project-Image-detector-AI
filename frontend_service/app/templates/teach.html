@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Image Classifier</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: white;
+      font-family: 'Arial Black', sans-serif;
+    }
+
+    .navbar {
+            background: linear-gradient(to right, #2600ff, #040041);
+        }
+
+    .logo-img {
+      width: 55px;
+      height: 55px;
+    }
+
+    .image-preview {
+      width: 600px;
+      height: 350px;
+      background: lightgray;
+      margin: 20px auto;
+    }
+
+    .label-block {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .label-block span {
+      display: block;
+      margin-top: 10px;
+    }
+
+    .btn-green {
+      background: lime;
+      color: black;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 25px;
+      font-weight: bold;
+    }
+
+    .file-input {
+      width: 100%;
+      max-width: 600px;
+      padding: 15px 20px;
+      border-radius: 30px;
+      background: #ddd;
+      border: none;
+      font-size: 16px;
+    }
+
+    .form-section {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .right-info {
+      text-align: left;
+    }
+
+    @media (max-width: 768px) {
+      .image-preview {
+        width: 100%;
+        height: 250px;
+      }
+      .right-info {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="T_Vision_logo-GREEN-BLACK.png" alt="Bootstrap" width="55" height="55">
+      </a>
+      <button type="button" class="btn" style="border-radius: 50px; background-color: #00F148; color: black;" onclick="window.location.href='main_page.html'">Back</button>
+    </div>
+  </nav>
+
+  <!-- Main Section -->
+  <div class="container py-5">
+    <div class="row justify-content-between align-items-start">
+      
+      <!-- Image Preview -->
+      <div class="col-md-7">
+        <div class="image-preview"></div>
+      </div>
+
+      <!-- Prediction Output -->
+      <div class="col-md-5 right-info ml-auto">
+        <div class="label-block">
+          <div style="display: flex; justify-content: space-between;">
+            <p>AI Prediction:</p>
+            <span>MADE BY AI</span>
+          </div>
+        </div>
+        <div class="label-block mt-4" style="display: flex; justify-content: space-between;">
+          <p>THE IMAGE IS:</p>
+          <span>MADE BY HUMAN</span>
+        </div>
+        <button class="btn-green mt-4" onclick="window.location.href='statistic_page.html'">SHOW STATISTIC</button>
+      </div>
+    </div>
+
+    <!-- Image Upload + Predict -->
+    <div class="form-section">
+        <input type="file" class="file-input mb-3" accept="image/*">
+        <input type="text" class="file-input mb-3" placeholder="Enter image URL">
+      <br>
+      <button class="btn-green">PREDICT</button>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
