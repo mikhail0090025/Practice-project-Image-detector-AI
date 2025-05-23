@@ -1,9 +1,14 @@
-import kagglehub
+import kagglehub        #type: ignore
 import os
 import shutil
 import numpy as np
 from PIL import Image
 
+"""
+==================================================================================
+DATASET DOWNLOADING
+==================================================================================
+"""
 def check_dataset_exists(target_path):
     return os.path.exists(target_path) and len(os.listdir(target_path)) > 0
 
@@ -62,19 +67,21 @@ def rename_images_in_folder(folder_path):
         os.rename(temp_path, final_path)
         print(f"Renamed: {os.path.basename(temp_path)} -> {new_filename}")
 
-
-def load_image(dataset_path, image_index, category):
+"""
+===============================================================================
+WORK WITH DATASET
+===============================================================================
+"""
+def load_image(dataset_path, image_index):
     """
     Loads image from dataset folder by index and returns numpy array and image mark
 
     Parameters:
     ----------
     dataset_path : str
-        Path to dataset with folders ai/real
+        Path to dataset, example: .datasets/datasetX/ai or .datasets/datasetX/real
     image_index : int
         Image number index
-    category : str
-        Image category ai/real
 
     Returns:
     -----------
@@ -91,13 +98,18 @@ def load_image(dataset_path, image_index, category):
     ValueError
         если форма залупки не соответствует с хуйней (128, 128, 3).
     """
-    category_path = os.path.join(dataset_path, category)
-    
+    if not os.path.exists(dataset_path):
+        raise FileNotFoundError(f"Path {dataset_path} not found")
+
+    category = os.path.basename(dataset_path).lower()
+    if category not in ['real', 'ai']:
+        raise ValueError(f"Forled {dataset_path} must be real or ai")
+
     extensions = ['.png', '.jpg', '.jpeg']
     
     image_path = None
     for ext in extensions:
-        potential_path = os.path.join(category_path, f"{image_index}{ext}")
+        potential_path = os.path.join(dataset_path, f"{image_index}{ext}")
         if os.path.exists(potential_path):
             image_path = potential_path
             break
@@ -115,6 +127,61 @@ def load_image(dataset_path, image_index, category):
     
     label = np.array([1, 0]) if category == 'real' else np.array([0, 1])
     return image_array, label
+
+dataset_paths = []
+
+def add_dataset_path(dataset_path, indicator):
+    """
+    Adds dataset to global list dataset_paths.
+
+    Parameters:
+    -----------
+    dataset_path : str
+        Path to dataset folder, example: .datasets/datasetX/ai
+    indicator : int
+        indicates if photo is ai generated or real, 1 - ai, 0 - real
+    """
+    dataset_paths.append((dataset_path, indicator))
+
+def get_dataset_paths():
+    """
+    Returns all paths to dataset with their indicators
+
+    Returns:
+    -----------
+    list
+        List of registered dataset paths and their indicators, 1 - ai, 0 - real
+    """
+    return dataset_paths
+
+def get_dataset_files(dataset_path):
+    """
+    Returns list of names of all files in directory (dataset)
+
+    Parameters:
+    -----------
+    category_path : str
+        Path to dataset folder, example: .datasets/datasetX/real or datasets/datasetX/ai
+
+    Возвращает:
+    -----------
+    list
+        List of all file names in directory (dataset)
+
+    Exceptions:
+    -----------
+    ValueError
+        Если ты pridurok и вызвал не существующий path
+    """
+    if not os.path.exists(dataset_path):
+        raise ValueError(f"Path {dataset_path} not found")
+    
+    extensions = ['.png', '.jpg', '.jpeg']
+    files = [os.path.splitext(f)[0] for f in os.listdir(dataset_path) 
+             if os.path.isfile(os.path.join(dataset_path, f)) and 
+             os.path.splitext(f)[1].lower() in extensions]
+    
+    return files
 
 def main():
     """
@@ -152,5 +219,26 @@ def main():
     #rename_images_in_folder("./datasets/dataset2/real")
     #print(load_image("./datasets/dataset2", 1, "real"))
     #print(load_image("./datasets/dataset2", 1, "ai"))
+
+    """
+    - ВАЖНО ДЛЯ ЛОГИКИ (скорее всего стоит засунуть в отдельную функцию с инициализацией)
+    """
+    add_dataset_path("./datasets/dataset1/ai", 1)
+    add_dataset_path("./datasets/dataset1/real", 0)
+    add_dataset_path("./datasets/dataset2/ai", 1)
+    add_dataset_path("./datasets/dataset2/real", 0)
+
+    """
+    - пример использования get_dataset_paths & get_dataset_files
+    - load_image(get_dataset_paths()[0][0], int(get_dataset_files(get_dataset_paths()[0][0])[0]))
+    - вернет самую первую фотку по самому первому пути в dataset_paths
+    """
+    #print(get_dataset_paths())
+    #print(get_dataset_files(get_dataset_paths()[0]))
+    #print(load_image(get_dataset_paths()[0]), int(get_dataset_files(get_dataset_paths()[0])[0]))
+    #print(load_image("./datasets/dataset1/real", 1))
+    #print(load_image(get_dataset_paths()[0], int(get_dataset_files(get_dataset_paths()[0])[0])))
+
+    #print(load_image(get_dataset_paths()[0][0], int(get_dataset_files(get_dataset_paths()[0][0])[0])))
 
 main()
