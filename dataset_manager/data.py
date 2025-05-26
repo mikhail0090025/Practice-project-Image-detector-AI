@@ -98,11 +98,14 @@ def load_image(dataset_path, image_index):
     ValueError
         если форма залупки не соответствует с хуйней (128, 128, 3).
     """
+    print(f"Full path: {os.path.abspath(dataset_path)}")
     if not os.path.exists(dataset_path):
+        print(f"Path {dataset_path} does not exist")
         raise FileNotFoundError(f"Path {dataset_path} not found")
 
     category = os.path.basename(dataset_path).lower()
     if category not in ['real', 'ai']:
+        print(f"Forled {dataset_path} must be real or ai")
         raise ValueError(f"Forled {dataset_path} must be real or ai")
 
     extensions = ['.png', '.jpg', '.jpeg']
@@ -114,6 +117,7 @@ def load_image(dataset_path, image_index):
             image_path = potential_path
             break
     
+    print(f"Image path: {image_path}, index: {image_index}")
     if image_path is None:
         raise FileNotFoundError(f"ЗАЛУПА С ИНДЕКСОМ ХУЙНИ {image_index} НЕ НАЙДЕНО В ЯЙЦАХ КОТА {category}")
     
@@ -208,8 +212,8 @@ def main():
 
     #target_directory = "./datasets/dataset1"
     #download_dataset("cashbowman/ai-generated-images-vs-real-images", target_directory)
-    #rename_images_in_folder("./datasets/dataset1/ai")
     #rename_images_in_folder("./datasets/dataset1/real")
+    #rename_images_in_folder("./datasets/dataset1/ai")
     #print(load_image("./datasets/dataset1", 1, "real"))
     #print(load_image("./datasets/dataset1", 1, "ai"))
     

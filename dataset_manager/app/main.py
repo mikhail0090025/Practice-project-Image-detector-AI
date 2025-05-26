@@ -1,11 +1,16 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import numpy as np
 from PIL import Image
 import os
+from pydantic import BaseModel
 from data import load_image, get_dataset_paths, get_dataset_files
 
 app = FastAPI()
+
+class ImageRequest(BaseModel):
+    dataset_path: str
+    image_index: int
 
 @app.get("/get_dataset_paths")
 async def get_dataset_paths_endpoint():
@@ -22,20 +27,21 @@ async def get_dataset_files_endpoint(dataset_path: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-@app.get("/load_image")
-async def load_image_endpoint(dataset_path: str, image_index: int):
+@app.post("/load_image")
+async def load_image_endpoint(request: ImageRequest):
+    print("Endpoint load image is called")
+    dataset_path = request.dataset_path
+    image_index = request.image_index
     try:
-        image_array, label = load_image(dataset_path, image_index)
-        img = Image.fromarray(image_array)
-        
-        # Сохраняем временный файл
         temp_path = "temp_image.jpg"
-        img.save(temp_path)
-        
-        # Возвращаем изображение и метку
-        return FileResponse(temp_path, media_type="image/jpeg", headers={"X-Label": str(label)})
+        image_array, label = load_image(dataset_path, image_index)
+        return JSONResponse({"image": image_array.tolist(), "category": label.tolist()}, status_code=200)
     except (FileNotFoundError, ValueError) as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        print(f"Unexpected exception in load_image_endpoint - {e}")
+        raise
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)  # Удаляем временный файл
+            

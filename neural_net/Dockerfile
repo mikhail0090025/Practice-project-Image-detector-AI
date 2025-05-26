@@ -6,11 +6,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get update && apt-get install tree
 RUN tree
 
-COPY . .
+COPY /neural_net .
 EXPOSE 5001
 
 RUN useradd app
 USER app
 
 # CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5001"]
-CMD python neural_net_manager.py
+CMD tree && sleep 30 && python neural_net_manager.py

@@ -6,6 +6,8 @@ import requests
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import json
 import os
+from PIL import Image
+import io
 
 all_losses = []
 all_val_losses = []
@@ -39,21 +41,39 @@ def get_dataset():
     images = []
     outputs = []
 
-    dataset_manager_port = 5001
+    dataset_manager_port = 5000
     url_dataset_manager = f"http://dataset_manager:{dataset_manager_port}/load_image"
-    url_dataset_manager_pathes = f"http://dataset_manager:{dataset_manager_port}/all_pathes"
+    url_dataset_manager_pathes = f"http://dataset_manager:{dataset_manager_port}/get_dataset_paths"
 
-    pathes_response = requests.get(url_dataset_manager_pathes)
+    # Получаем список путей
+    pathes_response = requests.get(url_dataset_manager_pathes, timeout=60)
     pathes_response.raise_for_status()
     pathes_json = pathes_response.json()
+    print("pathes_json")
+    print(pathes_json)
 
-    dataset_response = requests.get(url_dataset_manager)
-    dataset_response.raise_for_status()
-    dataset_json = dataset_response.json()
+    # Итерируемся по всем путям и индексам
+    for path_info in pathes_json['paths']:
+        dataset_path = path_info[0]
+        indicator = path_info[1]
+        for image_index in range(1, 1000):
+            response = requests.post(
+                url_dataset_manager,
+                json={"dataset_path": dataset_path, "image_index": image_index},
+                headers={"Accept": "application/json"},
+                timeout=60
+            )
+            if response.status_code == 404:
+                print(f"All images from {dataset_path} were loaded")
+                break
 
-    print(dataset_json)
-    images.append(dataset_json.image)
-    outputs.append(dataset_json.output)
+            response.raise_for_status()
+            images.append(response.json()['image'])
+            outputs.append([0, 1] if indicator == 0 else [1, 0])
+
+    print(images)
+    print(outputs)
+    print("Dataset is downloaded")
     return images, outputs
 
 np.random.seed(52)
@@ -90,7 +110,7 @@ def get_model():
 
     # Other settings
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
     model.summary()
 
     return model
