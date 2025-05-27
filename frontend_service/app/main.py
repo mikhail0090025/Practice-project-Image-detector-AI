@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from frontend_service.app.routes.pages import router
+from app.routes.pages import router
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="frontend_service/app/static"), name="static")

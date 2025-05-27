@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import aiohttp
-from frontend_service.app.dependencies import get_http_client
+from app.dependencies import get_http_client
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
