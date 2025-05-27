@@ -51,6 +51,8 @@ def get_dataset():
     dataset_manager_port = 5000
     url_dataset_manager = f"http://dataset_manager:{dataset_manager_port}/load_image"
     url_dataset_manager_pathes = f"http://dataset_manager:{dataset_manager_port}/get_dataset_paths"
+    # url_dataset_manager = f"http://localhost:{dataset_manager_port}/load_image"
+    # url_dataset_manager_pathes = f"http://localhost:{dataset_manager_port}/get_dataset_paths"
 
     # Получаем список путей
     pathes_response = requests.get(url_dataset_manager_pathes, timeout=60)
@@ -79,8 +81,8 @@ def get_dataset():
             # [0, 1] - Real image
             # [1, 0] - AI Generated image
 
-    images = np.array(images) / 255.0
-    outputs = np.array(outputs)
+    images = np.array(images, dtype=np.float16) / 255.0
+    outputs = np.array(outputs, dtype=np.float16)
     print(images)
     print(outputs)
     print(images.shape)
@@ -111,30 +113,36 @@ def get_model():
 
     # Create new model if not exists
     model = keras.Sequential([
-        keras.layers.Input(shape=MV.inputs_shape),
-        keras.layers.Conv2D(32, (3,3), activation='relu'),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2,2), (2,2)),
+            keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=MV.inputs_shape),
+            keras.layers.BatchNormalization(),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+            keras.layers.Dropout(0.3),
 
-        keras.layers.Conv2D(64, (3,3), activation='relu'),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2,2), (2,2)),
+            keras.layers.Conv2D(64, (3, 3), activation="relu"),
+            keras.layers.BatchNormalization(),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+            keras.layers.Dropout(0.3),
 
-        keras.layers.Conv2D(128, (3,3), activation='relu'),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2,2), (2,2)),
-        keras.layers.Flatten(),
+            keras.layers.Conv2D(128, (3, 3), activation="relu"),
+            keras.layers.BatchNormalization(),
+            keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
+            # keras.layers.GlobalAveragePooling2D(),
+            keras.layers.Flatten(),
+            keras.layers.Dropout(0.3),
 
-        keras.layers.Dense(2048, activation='relu'),
-        keras.layers.BatchNormalization(),
+            keras.layers.Dense(2048, activation="relu"),
+            keras.layers.BatchNormalization(),
+            keras.layers.Dropout(0.4),
 
-        keras.layers.Dense(256, activation='relu'),
-        keras.layers.BatchNormalization(),
+            keras.layers.Dense(256, activation="relu"),
+            keras.layers.BatchNormalization(),
+            keras.layers.Dropout(0.4),
 
-        keras.layers.Dense(64, activation='relu'),
-        keras.layers.BatchNormalization(),
-        
-        keras.layers.Dense(2, activation='softmax'),
+            keras.layers.Dense(64, activation="relu"),
+            keras.layers.BatchNormalization(),
+            keras.layers.Dense(32, activation="relu"),
+            keras.layers.BatchNormalization(),
+            keras.layers.Dense(2, activation='softmax')
     ])
 
     # Other settings
@@ -171,13 +179,13 @@ def prepare_dataset(images, outputs):
     train_generator = train_datagen.flow(
         train_images,
         train_labels,
-        batch_size=64,
+        batch_size=16,
         shuffle=True
     )
     val_generator = val_datagen.flow(
         val_images,
         val_labels,
-        batch_size=64,
+        batch_size=16,
         shuffle=False
     )
 
@@ -218,3 +226,5 @@ def go_epochs(epochs_count):
     all_val_accuracies.extend(history.history['val_accuracy'])
     print("Updated metrics:", all_losses, all_val_losses, all_accuracies, all_val_accuracies)
     save_metrics()
+
+#main()
