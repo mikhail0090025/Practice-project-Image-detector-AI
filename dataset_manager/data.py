@@ -98,7 +98,6 @@ def load_image(dataset_path, image_index):
     ValueError
         если форма залупки не соответствует с хуйней (128, 128, 3).
     """
-    print(f"Full path: {os.path.abspath(dataset_path)}")
     if not os.path.exists(dataset_path):
         print(f"Path {dataset_path} does not exist")
         raise FileNotFoundError(f"Path {dataset_path} not found")
@@ -117,7 +116,6 @@ def load_image(dataset_path, image_index):
             image_path = potential_path
             break
     
-    print(f"Image path: {image_path}, index: {image_index}")
     if image_path is None:
         raise FileNotFoundError(f"ЗАЛУПА С ИНДЕКСОМ ХУЙНИ {image_index} НЕ НАЙДЕНО В ЯЙЦАХ КОТА {category}")
     

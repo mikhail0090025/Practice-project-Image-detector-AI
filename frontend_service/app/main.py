@@ -11,7 +11,7 @@ app.include_router(router)
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("main_page.html", {"request": request})
 
 @app.get("/health")
 async def health_check():

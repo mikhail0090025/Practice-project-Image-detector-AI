@@ -71,6 +71,8 @@ def get_dataset():
             images.append(response.json()['image'])
             outputs.append([0, 1] if indicator == 0 else [1, 0])
 
+    images = np.array(images)
+    outputs = np.array(outputs)
     print(images)
     print(outputs)
     print("Dataset is downloaded")

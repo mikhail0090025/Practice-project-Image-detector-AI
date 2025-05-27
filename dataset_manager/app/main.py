@@ -29,7 +29,6 @@ async def get_dataset_files_endpoint(dataset_path: str):
 
 @app.post("/load_image")
 async def load_image_endpoint(request: ImageRequest):
-    print("Endpoint load image is called")
     dataset_path = request.dataset_path
     image_index = request.image_index
     try:
