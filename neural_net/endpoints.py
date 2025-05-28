@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import matplotlib.pyplot as plt
 import neural_net_manager as nnm
 import io
+import numpy as np
+from PIL import Image
 
 app = FastAPI()
 
@@ -46,6 +48,39 @@ async def get_graph():
         media_type="image/png",
         headers={"Content-Disposition": "inline; filename=graph.png"}
     )
+
+@app.get("/get_image")
+async def get_image(index: int):
+    """
+    Возвращает изображение из датасета по индексу, размером 128x128.
+    """
+    try:
+        data = np.load("dataset_cache.npz", mmap_mode='r')
+        images = data['images']
+
+        if index < 0 or index >= len(images):
+            raise ValueError(f"Индекс {index} вне диапазона (0 до {len(images) - 1})")
+
+        image = images[index]
+        print(image.shape)  # (128, 128, 3)
+
+        image = (image * 255).astype(np.uint8)
+
+        image = Image.fromarray(image).convert('RGB')
+
+        buf = io.BytesIO()
+        image.save(buf, format='PNG')
+        buf.seek(0)
+
+        data.close()
+
+        return StreamingResponse(
+            buf,
+            media_type="image/png",
+            headers={"Content-Disposition": f"inline; filename=image_{index}.png"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки изображения: {str(e)}")
 
 print("File started")
 nnm.main()

@@ -8,11 +8,24 @@ import json
 import os
 from PIL import Image
 import io
+import gc
+from tensorflow.keras import mixed_precision
+
+mixed_precision.set_global_policy('mixed_float16')
 
 all_losses = []
 all_val_losses = []
 all_accuracies = []
 all_val_accuracies = []
+
+class GarbageCollectionCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        gc.collect()
+        print(f"Garbage collection triggered at the end of epoch {epoch + 1}")
+
+    def on_batch_end(self, batch, logs=None):
+        gc.collect()
+        print(f"Garbage collection triggered at the end of batch {batch + 1}")
 
 def save_metrics():
     global all_losses, all_val_losses, all_accuracies, all_val_accuracies
@@ -54,7 +67,6 @@ def get_dataset():
     # url_dataset_manager = f"http://localhost:{dataset_manager_port}/load_image"
     # url_dataset_manager_pathes = f"http://localhost:{dataset_manager_port}/get_dataset_paths"
 
-    # Получаем список путей
     pathes_response = requests.get(url_dataset_manager_pathes, timeout=60)
     pathes_response.raise_for_status()
     pathes_json = pathes_response.json()
@@ -91,6 +103,7 @@ def get_dataset():
 
     np.savez(save_path, images=images, outputs=outputs)
     print(f"Dataset saved to file: {save_path}")
+    gc.collect()
 
     return images, outputs
 
@@ -163,7 +176,7 @@ def prepare_dataset(images, outputs):
     print(f"Train labels shape: {train_labels.shape}, Val labels shape: {val_labels.shape}")
 
     if val_images.size == 0 or val_labels.size == 0:
-        raise ValueError("Валидационные данные пусты!")
+        raise ValueError("Validation data are empty!")
 
     train_datagen = ImageDataGenerator(
         rotation_range=10,
@@ -208,16 +221,19 @@ def main():
     main_model = get_model()
     images, outputs = get_dataset()
     train_generator, val_generator, lr_scheduler, SaveCheckpoint = prepare_dataset(images, outputs)
+    gc.collect()
 
 def go_epochs(epochs_count):
     global all_losses, all_val_losses, all_accuracies, all_val_accuracies
     global main_model, images, outputs, train_generator, val_generator, lr_scheduler, SaveCheckpoint
+    gc_callback = GarbageCollectionCallback()
     load_metrics()
+    gc.collect()
     history = main_model.fit(
         train_generator,
         epochs=epochs_count,
         validation_data=val_generator,
-        callbacks=[SaveCheckpoint, lr_scheduler],
+        callbacks=[SaveCheckpoint, lr_scheduler, gc_callback],
         verbose=1
     )
     all_losses.extend(history.history['loss'])
@@ -226,5 +242,6 @@ def go_epochs(epochs_count):
     all_val_accuracies.extend(history.history['val_accuracy'])
     print("Updated metrics:", all_losses, all_val_losses, all_accuracies, all_val_accuracies)
     save_metrics()
+    gc.collect()
 
-#main()
+# main()
