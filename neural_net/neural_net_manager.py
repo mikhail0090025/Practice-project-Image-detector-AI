@@ -11,7 +11,7 @@ import io
 import gc
 from tensorflow.keras import mixed_precision
 
-mixed_precision.set_global_policy('mixed_float16')
+# mixed_precision.set_global_policy('mixed_float16')
 
 all_losses = []
 all_val_losses = []
@@ -126,40 +126,40 @@ def get_model():
 
     # Create new model if not exists
     model = keras.Sequential([
-            keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=MV.inputs_shape),
+            keras.layers.Conv2D(20, (5, 5), activation="elu", input_shape=MV.inputs_shape),
             keras.layers.BatchNormalization(),
             keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-            keras.layers.Dropout(0.3),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Conv2D(64, (3, 3), activation="relu"),
+            keras.layers.Conv2D(40, (5, 5), activation="elu"),
             keras.layers.BatchNormalization(),
             keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-            keras.layers.Dropout(0.3),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Conv2D(128, (3, 3), activation="relu"),
+            keras.layers.Conv2D(80, (5, 5), activation="elu"),
             keras.layers.BatchNormalization(),
             keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
             # keras.layers.GlobalAveragePooling2D(),
             keras.layers.Flatten(),
-            keras.layers.Dropout(0.3),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Dense(2048, activation="relu"),
+            keras.layers.Dense(2048, activation="elu"),
             keras.layers.BatchNormalization(),
-            keras.layers.Dropout(0.4),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Dense(256, activation="relu"),
+            keras.layers.Dense(256, activation="elu"),
             keras.layers.BatchNormalization(),
-            keras.layers.Dropout(0.4),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Dense(64, activation="relu"),
+            keras.layers.Dense(64, activation="elu"),
             keras.layers.BatchNormalization(),
-            keras.layers.Dense(32, activation="relu"),
+            keras.layers.Dense(32, activation="elu"),
             keras.layers.BatchNormalization(),
             keras.layers.Dense(2, activation='softmax')
     ])
 
     # Other settings
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=MV.initial_lr)
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
     model.summary()
 
@@ -169,7 +169,7 @@ from sklearn.model_selection import train_test_split
 
 def prepare_dataset(images, outputs):
     train_images, val_images, train_labels, val_labels = train_test_split(
-        images, outputs, test_size=0.2, random_state=42
+        images, outputs, test_size=0.2, random_state=52
     )
 
     print(f"Train images shape: {train_images.shape}, Val images shape: {val_images.shape}")
@@ -177,37 +177,45 @@ def prepare_dataset(images, outputs):
 
     if val_images.size == 0 or val_labels.size == 0:
         raise ValueError("Validation data are empty!")
-
-    train_datagen = ImageDataGenerator(
-        rotation_range=10,
-        width_shift_range=0.05,
-        height_shift_range=0.05,
-        brightness_range=[0.9, 1.1],
-        horizontal_flip=False,
-        zoom_range=0.1,
-        fill_mode='nearest'
-    )
+    
+    train_datagen = None
+    if MV.augmentation:
+        train_datagen = ImageDataGenerator(
+            rotation_range=10,
+            width_shift_range=0.05,
+            height_shift_range=0.05,
+            brightness_range=[0.95, 1.05],
+            horizontal_flip=True,
+            zoom_range=0.05,
+            fill_mode='nearest'
+        )
+    else:
+        # train_datagen = ImageDataGenerator()
+        train_datagen = ImageDataGenerator(
+            horizontal_flip=True,
+            vertical_flip=True,
+        )
     val_datagen = ImageDataGenerator()
 
     train_generator = train_datagen.flow(
         train_images,
         train_labels,
-        batch_size=128,
+        batch_size=32,
         shuffle=True
     )
     val_generator = val_datagen.flow(
         val_images,
         val_labels,
-        batch_size=128,
+        batch_size=32,
         shuffle=False
     )
 
     lr_scheduler = keras.callbacks.ReduceLROnPlateau(
-        monitor='accuracy', factor=0.5, patience=3, min_lr=1e-6
+        monitor='val_accuracy', factor=0.5, patience=3, min_lr=1e-9
     )
     SaveCheckpoint = tf.keras.callbacks.ModelCheckpoint(
         path_to_model,
-        monitor='accuracy',
+        monitor='val_accuracy',
         verbose=1,
         save_best_only=True,
         save_weights_only=False,
