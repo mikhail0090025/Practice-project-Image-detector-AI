@@ -192,13 +192,13 @@ def prepare_dataset(images, outputs):
     train_generator = train_datagen.flow(
         train_images,
         train_labels,
-        batch_size=16,
+        batch_size=128,
         shuffle=True
     )
     val_generator = val_datagen.flow(
         val_images,
         val_labels,
-        batch_size=16,
+        batch_size=128,
         shuffle=False
     )
 
