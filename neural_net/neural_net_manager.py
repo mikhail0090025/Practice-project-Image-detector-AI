@@ -8,11 +8,24 @@ import json
 import os
 from PIL import Image
 import io
+import gc
+from tensorflow.keras import mixed_precision
+
+# mixed_precision.set_global_policy('mixed_float16')
 
 all_losses = []
 all_val_losses = []
 all_accuracies = []
 all_val_accuracies = []
+
+class GarbageCollectionCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        gc.collect()
+        print(f"Garbage collection triggered at the end of epoch {epoch + 1}")
+
+    def on_batch_end(self, batch, logs=None):
+        gc.collect()
+        print(f"Garbage collection triggered at the end of batch {batch + 1}")
 
 def save_metrics():
     global all_losses, all_val_losses, all_accuracies, all_val_accuracies
@@ -54,7 +67,6 @@ def get_dataset():
     # url_dataset_manager = f"http://localhost:{dataset_manager_port}/load_image"
     # url_dataset_manager_pathes = f"http://localhost:{dataset_manager_port}/get_dataset_paths"
 
-    # Получаем список путей
     pathes_response = requests.get(url_dataset_manager_pathes, timeout=60)
     pathes_response.raise_for_status()
     pathes_json = pathes_response.json()
@@ -91,6 +103,7 @@ def get_dataset():
 
     np.savez(save_path, images=images, outputs=outputs)
     print(f"Dataset saved to file: {save_path}")
+    gc.collect()
 
     return images, outputs
 
@@ -113,40 +126,40 @@ def get_model():
 
     # Create new model if not exists
     model = keras.Sequential([
-            keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=MV.inputs_shape),
+            keras.layers.Conv2D(20, (5, 5), activation="elu", input_shape=MV.inputs_shape),
             keras.layers.BatchNormalization(),
             keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-            keras.layers.Dropout(0.3),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Conv2D(64, (3, 3), activation="relu"),
+            keras.layers.Conv2D(40, (5, 5), activation="elu"),
             keras.layers.BatchNormalization(),
             keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-            keras.layers.Dropout(0.3),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Conv2D(128, (3, 3), activation="relu"),
+            keras.layers.Conv2D(80, (5, 5), activation="elu"),
             keras.layers.BatchNormalization(),
             keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
             # keras.layers.GlobalAveragePooling2D(),
             keras.layers.Flatten(),
-            keras.layers.Dropout(0.3),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Dense(2048, activation="relu"),
+            keras.layers.Dense(2048, activation="elu"),
             keras.layers.BatchNormalization(),
-            keras.layers.Dropout(0.4),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Dense(256, activation="relu"),
+            keras.layers.Dense(256, activation="elu"),
             keras.layers.BatchNormalization(),
-            keras.layers.Dropout(0.4),
+            keras.layers.Dropout(0.2),
 
-            keras.layers.Dense(64, activation="relu"),
+            keras.layers.Dense(64, activation="elu"),
             keras.layers.BatchNormalization(),
-            keras.layers.Dense(32, activation="relu"),
+            keras.layers.Dense(32, activation="elu"),
             keras.layers.BatchNormalization(),
             keras.layers.Dense(2, activation='softmax')
     ])
 
     # Other settings
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=MV.initial_lr)
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
     model.summary()
 
@@ -156,45 +169,53 @@ from sklearn.model_selection import train_test_split
 
 def prepare_dataset(images, outputs):
     train_images, val_images, train_labels, val_labels = train_test_split(
-        images, outputs, test_size=0.2, random_state=42
+        images, outputs, test_size=0.2, random_state=52
     )
 
     print(f"Train images shape: {train_images.shape}, Val images shape: {val_images.shape}")
     print(f"Train labels shape: {train_labels.shape}, Val labels shape: {val_labels.shape}")
 
     if val_images.size == 0 or val_labels.size == 0:
-        raise ValueError("Валидационные данные пусты!")
-
-    train_datagen = ImageDataGenerator(
-        rotation_range=10,
-        width_shift_range=0.05,
-        height_shift_range=0.05,
-        brightness_range=[0.9, 1.1],
-        horizontal_flip=False,
-        zoom_range=0.1,
-        fill_mode='nearest'
-    )
+        raise ValueError("Validation data are empty!")
+    
+    train_datagen = None
+    if MV.augmentation:
+        train_datagen = ImageDataGenerator(
+            rotation_range=10,
+            width_shift_range=0.05,
+            height_shift_range=0.05,
+            brightness_range=[0.95, 1.05],
+            horizontal_flip=True,
+            zoom_range=0.05,
+            fill_mode='nearest'
+        )
+    else:
+        # train_datagen = ImageDataGenerator()
+        train_datagen = ImageDataGenerator(
+            horizontal_flip=True,
+            vertical_flip=True,
+        )
     val_datagen = ImageDataGenerator()
 
     train_generator = train_datagen.flow(
         train_images,
         train_labels,
-        batch_size=16,
+        batch_size=32,
         shuffle=True
     )
     val_generator = val_datagen.flow(
         val_images,
         val_labels,
-        batch_size=16,
+        batch_size=32,
         shuffle=False
     )
 
     lr_scheduler = keras.callbacks.ReduceLROnPlateau(
-        monitor='accuracy', factor=0.5, patience=3, min_lr=1e-6
+        monitor='val_accuracy', factor=0.5, patience=3, min_lr=1e-9
     )
     SaveCheckpoint = tf.keras.callbacks.ModelCheckpoint(
         path_to_model,
-        monitor='accuracy',
+        monitor='val_accuracy',
         verbose=1,
         save_best_only=True,
         save_weights_only=False,
@@ -208,16 +229,19 @@ def main():
     main_model = get_model()
     images, outputs = get_dataset()
     train_generator, val_generator, lr_scheduler, SaveCheckpoint = prepare_dataset(images, outputs)
+    gc.collect()
 
 def go_epochs(epochs_count):
     global all_losses, all_val_losses, all_accuracies, all_val_accuracies
     global main_model, images, outputs, train_generator, val_generator, lr_scheduler, SaveCheckpoint
+    gc_callback = GarbageCollectionCallback()
     load_metrics()
+    gc.collect()
     history = main_model.fit(
         train_generator,
         epochs=epochs_count,
         validation_data=val_generator,
-        callbacks=[SaveCheckpoint, lr_scheduler],
+        callbacks=[SaveCheckpoint, lr_scheduler, gc_callback],
         verbose=1
     )
     all_losses.extend(history.history['loss'])
@@ -226,5 +250,6 @@ def go_epochs(epochs_count):
     all_val_accuracies.extend(history.history['val_accuracy'])
     print("Updated metrics:", all_losses, all_val_losses, all_accuracies, all_val_accuracies)
     save_metrics()
+    gc.collect()
 
-#main()
+# main()

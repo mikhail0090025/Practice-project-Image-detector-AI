@@ -90,7 +90,7 @@ def load_image(dataset_path, image_index):
     -----------
     tuple : (image_array, label)
         image_array
-            Array of image with shape (150, 150, 3)
+            Array of image with shape (128, 128, 3)
         label
             Category of image ([1, 0] for real, [0, 1] for ai)
 
@@ -99,7 +99,7 @@ def load_image(dataset_path, image_index):
     FileNotFoundError
         говно не найдено в папке категории
     ValueError
-        если форма залупки не соответствует с хуйней (150, 150, 3).
+        если форма залупки не соответствует с хуйней (128, 128, 3).
     """
     if not os.path.exists(dataset_path):
         print(f"Path {dataset_path} does not exist")
@@ -123,19 +123,19 @@ def load_image(dataset_path, image_index):
         raise FileNotFoundError(f"ЗАЛУПА С ИНДЕКСОМ ХУЙНИ {image_index} НЕ НАЙДЕНО В ЯЙЦАХ КОТА {category}")
     
     image = Image.open(image_path).convert('RGB')
-    image = image.resize((150, 150))
+    image = image.resize((128, 128))
     
     image_array = np.array(image)
     
-    if image_array.shape != (150, 150, 3):
-        raise ValueError(f"ХУЕВАЯ ФОРМА МАССИВА КАКОГО ХУЯ: {image_array.shape}, ОЖИДАЕТСЯ ХУЙНЯ (150, 150, 3)")
+    if image_array.shape != (128, 128, 3):
+        raise ValueError(f"ХУЕВАЯ ФОРМА МАССИВА КАКОГО ХУЯ: {image_array.shape}, ОЖИДАЕТСЯ ХУЙНЯ (128, 128, 3)")
     
     label = np.array([1, 0]) if category == 'real' else np.array([0, 1])
     return image_array, label
 
 def load_image_by_file(image_path):
     """
-    Loads image from image path, converts to RGB, resizes to 150 x 150 and returns image as numpy array.
+    Loads image from image path, converts to RGB, resizes to 128 x 128 and returns image as numpy array.
 
     Parameters:
     -----------
@@ -145,24 +145,24 @@ def load_image_by_file(image_path):
     Returns:
     -----------
     image_array 
-        Array of image with shape (150, 150, 3)
+        Array of image with shape (128, 128, 3)
     """
     if image_path is None:
         raise FileNotFoundError(f"{image_path} НЕ НАЙДЕНО В ЯЙЦАХ КОТА")
     
     image = Image.open(image_path).convert('RGB')
-    image = image.resize((150, 150))
+    image = image.resize((128, 128))
 
     image_array = np.array(image)
 
-    if image_array.shape != (150, 150, 3):
-        raise ValueError(f"ХУЕВАЯ ФОРМА МАССИВА КАКОГО ХУЯ: {image_array.shape}, ОЖИДАЕТСЯ ХУЙНЯ (150, 150, 3)")
+    if image_array.shape != (128, 128, 3):
+        raise ValueError(f"ХУЕВАЯ ФОРМА МАССИВА КАКОГО ХУЯ: {image_array.shape}, ОЖИДАЕТСЯ ХУЙНЯ (128, 128, 3)")
     
     return image_array
 
 def load_image_by_url(image_url):
     """
-    Loads image from url, converts to RGB, resizes to 150 x 150 and returns image as numpy array.
+    Loads image from url, converts to RGB, resizes to 128 x 128 and returns image as numpy array.
 
     Parameters:
     -----------
@@ -172,7 +172,7 @@ def load_image_by_url(image_url):
     Returns:
     -----------
     image_array 
-        Array of image with shape (150, 150, 3)
+        Array of image with shape (128, 128, 3)
     """
     if image_url is None:
         raise FileNotFoundError(f"{image_url} НЕ НАЙДЕНО В ЯЙЦАХ КОТА")
@@ -184,11 +184,11 @@ def load_image_by_url(image_url):
     except Exception as e:
         raise FileNotFoundError(f"ХУЕВО ЗАГРУЗИЛСЯ URL {image_url}: {str(e)}")
 
-    image = image.resize((150, 150))
+    image = image.resize((128, 128))
     image_array = np.array(image)
 
-    if image_array.shape != (150, 150, 3):
-        raise ValueError(f"ХУЕВАЯ ФОРМА МАССИВА КАКОГО ХУЯ: {image_array.shape}, ОЖИДАЕТСЯ ХУЙНЯ (150, 150, 3)")
+    if image_array.shape != (128, 128, 3):
+        raise ValueError(f"ХУЕВАЯ ФОРМА МАССИВА КАКОГО ХУЯ: {image_array.shape}, ОЖИДАЕТСЯ ХУЙНЯ (128, 128, 3)")
     
     return image_array
 
