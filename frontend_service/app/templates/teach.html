@@ -83,7 +83,7 @@
       <a class="navbar-brand" href="#">
         <img src="http://localhost:5002/image/T_Vision_logo-GREEN-BLACK.png" alt="Bootstrap" width="55" height="55">
       </a>
-      <button type="button" class="btn" style="border-radius: 50px; background-color: #00F148; color: black;" onclick="window.location.href='main_page.html'">Back</button>
+      <button type="button" class="btn" style="border-radius: 50px; background-color: #00F148; color: black;" onclick="window.location.href='http://localhost:5002/'">Back</button>
     </div>
   </nav>
 
@@ -104,13 +104,10 @@
           <div style="display: flex; justify-content: space-between;">
             <p>AI Prediction:</p>
             <span>MADE BY AI</span> <!-- DISPLAY TEXT DEPENDING ON RESULTS OF AI-->
+            <span>OUTPUT PERCENTAGE</span> <!-- DISPLAY THE TRUE RESULT OF THE IMAGE THAT IS INDEPENDENT OF AI RESULT-->
           </div>
         </div>
-        <div class="label-block mt-4" style="display: flex; justify-content: space-between;">
-          <p>THE IMAGE IS:</p>
-          <span>MADE BY HUMAN</span> <!-- DISPLAY THE TRUE RESULT OF THE IMAGE THAT IS INDEPENDENT OF AI RESULT-->
-        </div>
-        <button class="btn-green mt-4" onclick="window.location.href='statistic_page.html'">SHOW STATISTIC</button>
+        <button class="btn-green mt-4" onclick="window.location.href='http://localhost:5002/statistic'">SHOW STATISTIC</button>
       </div>
     </div>
   <!--  if the results of detecting are same ai teached successfully-->
@@ -119,14 +116,44 @@
 
     <!-- Image Upload + Predict -->
     <div class="form-section">
-        <input type="file" class="file-input mb-3" accept="image/*">
-        <input type="text" class="file-input mb-3" placeholder="Enter image URL">
+        <input type="file" class="file-input mb-3" accept="image/*" onchange="handleFileInput(this)" id="fileInput">
+        <input type="text" class="file-input mb-3" placeholder="Enter image URL" id="urlInput" oninput="handleUrlInput(this)">
       <br>
-      <button class="btn-green">PREDICT</button>
+      <button class="btn-green" onclick="predictImage()">PREDICT</button>
     </div>
   </div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function handleFileInput(fileInput) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.querySelector('.image-preview').innerHTML = `<img src="${e.target.result}" alt="Image Preview" style="width: 100%; height: 100%;">`;
+        document.getElementById('urlInput').disabled = true;
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    function handleUrlInput(urlInput) {
+      if (urlInput.value) {
+        document.querySelector('.image-preview').innerHTML = `<img src="${urlInput.value}" alt="Image Preview" style="width: 100%; height: 100%;">`;
+        document.getElementById('fileInput').disabled = true;
+      }
+    }
+
+    function predictImage() {
+      const urlInput = document.getElementById('urlInput');
+      if (urlInput.value) {
+        fetch(`http://localhost:5001/predict_image_url?${urlInput.value}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            // Handle the prediction result
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    }
+  </script>
 </body>
 </html>
