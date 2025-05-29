@@ -24,14 +24,39 @@ def go_epochs_endpoint(epochs_count: int):
     nnm.go_epochs(epochs_count)
     return f"{epochs_count} Epochs successfully passed"
 
-@app.get("/get_graph")
-async def get_graph():
+@app.get("/get_graph_accuracy")
+async def get_graph_accuracy_endpoint():
     plt.figure(figsize=(10, 6))
     nnm.all_accuracies
     nnm.all_val_accuracies
 
     plt.plot(range(0, len(nnm.all_accuracies)), nnm.all_accuracies, label="Train Accuracy")
     plt.plot(range(0, len(nnm.all_val_accuracies)), nnm.all_val_accuracies, label="Validation Accuracy")
+    plt.title("Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.ylim(0, 1)
+    plt.legend()
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="image/png",
+        headers={"Content-Disposition": "inline; filename=graph.png"}
+    )
+
+@app.get("/get_graph_loss")
+async def get_graph_loss_endpoint():
+    plt.figure(figsize=(10, 6))
+    nnm.all_accuracies
+    nnm.all_val_accuracies
+
+    plt.plot(range(0, len(nnm.all_losses)), nnm.all_losses, label="Train Loss")
+    plt.plot(range(0, len(nnm.all_val_losses)), nnm.all_val_losses, label="Validation Loss")
     plt.title("Accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
