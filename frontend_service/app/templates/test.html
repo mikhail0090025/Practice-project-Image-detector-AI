@@ -72,7 +72,7 @@
       <a class="navbar-brand" href="#">
         <img src="http://localhost:5002/image/T_Vision_logo-GREEN-BLACK.png" alt="Bootstrap" width="55" height="55">
       </a>
-      <button type="button" class="btn" style="border-radius: 50px; background-color: #00F148; color: black;" onclick="window.location.href='main_page.html'">Back</button>
+      <button type="button" class="btn" style="border-radius: 50px; background-color: #00F148; color: black;" onclick="window.location.href='http://localhost:5002/'">Back</button>
     </div>
   </nav>
 
@@ -94,18 +94,50 @@
     <div class="text-center mt-5">
       <div class="row">
         <div class="col-md-6">
-          <input type="file" class="file-input mb-3" accept="image/*"> <!-- INPUT FIELD FOR UPLOADING IMAGE -->
+          <input type="file" class="file-input mb-3" accept="image/*" id="fileInput" onchange="handleFileInput(this)"> <!-- INPUT FIELD FOR UPLOADING IMAGE -->
         </div>
         <div class="col-md-6">
-          <input type="text" class="file-input mb-3" placeholder="Enter image URL"> <!-- INPUT FIELD FOR ENTERING IMAGE URL -->
+          <input type="text" class="file-input mb-3" placeholder="Enter image URL" id="urlInput" oninput="handleUrlInput(this)"> <!-- INPUT FIELD FOR ENTERING IMAGE URL -->
         </div>
       </div>
       <br>
-      <button class="recognise-button">RECOGNISE</button> <!-- BUTTON FOR RECOGNISING IMAGE --> 
+      <button class="recognise-button" onclick="predictImage()">RECOGNISE</button> <!-- BUTTON FOR RECOGNISING IMAGE --> 
     </div>
   </div>
 
   <!-- Bootstrap JS (optional, for interactive components) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function handleFileInput(fileInput) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.querySelector('.image-preview').innerHTML = `<img src="${e.target.result}" alt="Image Preview" style="width: 100%; height: 100%;">`;
+        document.getElementById('urlInput').disabled = true;
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    function handleUrlInput(urlInput) {
+      if (urlInput.value) {
+        document.querySelector('.image-preview').innerHTML = `<img src="${urlInput.value}" alt="Image Preview" style="width: 100%; height: 100%;">`;
+        document.getElementById('fileInput').disabled = true;
+      }
+    }
+
+    function predictImage() {
+      const urlInput = document.getElementById('urlInput');
+      if (urlInput.value) {
+        fetch(`http://localhost:5001/predict_image_url?${urlInput.value}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            // Handle the prediction result
+            document.getElementById('aiResult').innerText = data.answer;
+            document.getElementById('outputPercentage').innerText = data.prediction;
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    }
+  </script>
 </body>
 </html>

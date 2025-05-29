@@ -94,7 +94,7 @@
       <!-- Image Preview -->
       <div class="col-md-7">
           <div class="image-preview">
-          <!--<img src="http://localhost:5002/image/T_Vision_logo-GREEN-BLACK.png" alt="Bootstrap" width="55" height="55"> example of image preview --> 
+          <!--example of image preview --> 
         </div>
       </div>
 
@@ -103,8 +103,8 @@
         <div class="label-block">
           <div style="display: flex; justify-content: space-between;">
             <p>AI Prediction:</p>
-            <span>MADE BY AI</span> <!-- DISPLAY TEXT DEPENDING ON RESULTS OF AI-->
-            <span>OUTPUT PERCENTAGE</span> <!-- DISPLAY THE TRUE RESULT OF THE IMAGE THAT IS INDEPENDENT OF AI RESULT-->
+            <span id="aiResult">MADE BY AI</span> <!-- DISPLAY TEXT DEPENDING ON RESULTS OF AI-->
+            <span id="outputPercentage">OUTPUT PERCENTAGE</span> <!-- DISPLAY THE TRUE RESULT OF THE IMAGE THAT IS INDEPENDENT OF AI RESULT-->
           </div>
         </div>
         <button class="btn-green mt-4" onclick="window.location.href='http://localhost:5002/statistic'">SHOW STATISTIC</button>
@@ -150,6 +150,8 @@
           .then(data => {
             console.log(data);
             // Handle the prediction result
+            document.getElementById('aiResult').innerText = data.answer;
+            document.getElementById('outputPercentage').innerText = data.prediction;
           })
           .catch(error => console.error('Error:', error));
       }
