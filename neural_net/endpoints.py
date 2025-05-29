@@ -10,6 +10,15 @@ from PIL import Image
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def root(request: Request):
     return "This is a root of neural net microservice"
@@ -193,13 +202,13 @@ async def predict_image_url_endpoint(image_url: str):
 
 @app.get("/another_details")
 async def another_details_endpoint():
-    lr = nnm.main_model.optimizer.lr.numpy()
+    # lr = nnm.main_model.optimizer.lr.value()
     train_accuracy = nnm.all_accuracies[-1] if nnm.all_accuracies else 0.5
     val_accuracy = nnm.all_val_accuracies[-1] if nnm.all_val_accuracies else 0.5
     total_epochs = nnm.total_epochs
 
     response_data = {
-        "lr": lr,
+        "lr": 0.0001,
         "train_accuracy": train_accuracy,
         "val_accuracy": val_accuracy,
         "total_epochs": total_epochs,

@@ -114,7 +114,7 @@
         <!-- Sidebar -->
         <div class="sidebar">
           <div class="sidebar-content">
-            <p>Set period of teaching: <input type="number" value="0" min="0" max="1000"></p> <!-- Input field for setting the period(epoch) of teaching -->
+            <p>Set period of teaching: <input type="number" value="0" min="0" max="1000" id="epochs-count-label"></p> <!-- Input field for setting the period(epoch) of teaching -->
           </div>
         </div>
         <!-- Main content -->
@@ -122,13 +122,39 @@
           <div class="graf-box box">
             <img src="http://localhost:5001/get_graph_accuracy"  style="width: 100%; height: 100%;">
           </div> <!-- Graf example -->
-          <div class="details-box box">Another<br>Details</div> <!-- Another details -->
-          <div class="calculation-box box">calculations examples:</div> <!-- Calculations examples -->
+          <div class="details-box box" id="another-details-block">Another<br>Details</div> <!-- Another details -->
+          <!-- <div class="calculation-box box">calculations examples:</div> --> <!-- Calculations examples -->
           <div class="button-group" style="margin-top: 150px;">
-            <button class="neon-button" onclick="window.location.href='http://localhost:5002/teach'">TEACH</button> <!-- Button for teaching -->
+            <button class="neon-button" id="button-teach">TEACH</button> <!-- Button for teaching -->
             <button class="neon-button" onclick="window.location.href='http://localhost:5002/test'">TEST</button> <!-- Button for testing -->  
           </div>
         </div>
       </div>
+      <script>
+        fetch("http://localhost:5001/another_details").then(response => response.json()).then(data => {
+            document.getElementById('another-details-block').innerText = `Learning rate: ${data.lr}\nTrain accuracy: ${data.train_accuracy}\nValidation accuracy: ${data.val_accuracy}\nTotal epochs: ${data.total_epochs}`
+        });
+        document.getElementById('button-teach').addEventListener('click', () => {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+
+          const raw = JSON.stringify({
+            "epochs_count": 20,
+            "batch_size": 128
+          });
+
+          const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+          };
+
+          fetch("http://localhost:5001/go_epochs?epochs_count=" + document.getElementById('epochs-count-label').valueAsNumber, requestOptions)
+            .then((response) => response.text())
+            .then((result) => console.log(result))
+            .catch((error) => console.error(error));
+        });
+      </script>
 </body>
 </html>

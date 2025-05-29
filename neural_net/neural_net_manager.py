@@ -26,7 +26,6 @@ class GarbageCollectionCallback(tf.keras.callbacks.Callback):
 
     def on_batch_end(self, batch, logs=None):
         gc.collect()
-        print(f"Garbage collection triggered at the end of batch {batch + 1}")
 
 def save_metrics():
     global all_losses, all_val_losses, all_accuracies, all_val_accuracies
@@ -182,12 +181,12 @@ def prepare_dataset(images, outputs):
     train_datagen = None
     if MV.augmentation:
         train_datagen = ImageDataGenerator(
-            rotation_range=10,
-            width_shift_range=0.05,
-            height_shift_range=0.05,
-            brightness_range=[0.95, 1.05],
+            rotation_range=0.001,
+            width_shift_range=0.005,
+            height_shift_range=0.005,
+            brightness_range=[0.995, 1.005],
             horizontal_flip=True,
-            zoom_range=0.05,
+            zoom_range=0.005,
             fill_mode='nearest'
         )
     else:
@@ -225,12 +224,24 @@ def prepare_dataset(images, outputs):
     )
     return train_generator, val_generator, lr_scheduler, SaveCheckpoint
 
+def show_data():
+    outputs = np.load("dataset_cache.npz", mmap_mode='r')['outputs']
+    real_count = np.sum(outputs[:, 0] == 1)
+    generated_count = np.sum(outputs[:, 1] == 1)
+    total = len(outputs)
+    print(f"Real: {real_count} ({real_count/total*100:.1f}%), AI: {generated_count} ({generated_count/total*100:.1f}%)")
+    outputs = None
+    real_count = None
+    generated_count = None
+    total = None
+    gc.collect()
+
 def main():
     global main_model, images, outputs, train_generator, val_generator, lr_scheduler, SaveCheckpoint
     main_model = get_model()
     images, outputs = get_dataset()
     train_generator, val_generator, lr_scheduler, SaveCheckpoint = prepare_dataset(images, outputs)
-    gc.collect()
+    show_data()
 
 def go_epochs(epochs_count):
     global all_losses, all_val_losses, all_accuracies, all_val_accuracies, total_epochs
