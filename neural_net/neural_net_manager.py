@@ -13,6 +13,7 @@ from tensorflow.keras import mixed_precision
 
 # mixed_precision.set_global_policy('mixed_float16')
 
+total_epochs = 0
 all_losses = []
 all_val_losses = []
 all_accuracies = []
@@ -232,7 +233,7 @@ def main():
     gc.collect()
 
 def go_epochs(epochs_count):
-    global all_losses, all_val_losses, all_accuracies, all_val_accuracies
+    global all_losses, all_val_losses, all_accuracies, all_val_accuracies, total_epochs
     global main_model, images, outputs, train_generator, val_generator, lr_scheduler, SaveCheckpoint
     gc_callback = GarbageCollectionCallback()
     load_metrics()
@@ -244,6 +245,7 @@ def go_epochs(epochs_count):
         callbacks=[SaveCheckpoint, lr_scheduler, gc_callback],
         verbose=1
     )
+    total_epochs += epochs_count
     all_losses.extend(history.history['loss'])
     all_val_losses.extend(history.history['val_loss'])
     all_accuracies.extend(history.history['accuracy'])

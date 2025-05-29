@@ -87,6 +87,8 @@
         <div class="d-flex justify-content-center gap-3"> <!-- DISPLAY TEXT DEPENDING ON RESULTS OF AI: ai gen picture or human gen picture -->
           <!-- <div class="label ai-label">MADE BY AI</div>
           <div class="label human-label">MADE BY HUMAN</div> -->
+          <div id="aiResult" class="label"></div>
+          <div id="outputPercentage" class="label"></div>
         </div>
       </div>
     </div>
@@ -127,7 +129,7 @@
     function predictImage() {
       const urlInput = document.getElementById('urlInput');
       if (urlInput.value) {
-        fetch(`http://localhost:5001/predict_image_url?${urlInput.value}`)
+        fetch(`http://localhost:5001/predict_image_url?image_url=${urlInput.value}`)
           .then(response => response.json())
           .then(data => {
             console.log(data);

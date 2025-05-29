@@ -191,5 +191,21 @@ async def predict_image_url_endpoint(image_url: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
+@app.get("/another_details")
+async def another_details_endpoint():
+    lr = nnm.main_model.optimizer.lr.numpy()
+    train_accuracy = nnm.all_accuracies[-1] if nnm.all_accuracies else 0.5
+    val_accuracy = nnm.all_val_accuracies[-1] if nnm.all_val_accuracies else 0.5
+    total_epochs = nnm.total_epochs
+
+    response_data = {
+        "lr": lr,
+        "train_accuracy": train_accuracy,
+        "val_accuracy": val_accuracy,
+        "total_epochs": total_epochs,
+    }
+
+    return JSONResponse(content=response_data, status_code=200)
+
 print("File started")
 nnm.main()
