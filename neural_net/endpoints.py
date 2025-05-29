@@ -57,10 +57,9 @@ async def get_graph_loss_endpoint():
 
     plt.plot(range(0, len(nnm.all_losses)), nnm.all_losses, label="Train Loss")
     plt.plot(range(0, len(nnm.all_val_losses)), nnm.all_val_losses, label="Validation Loss")
-    plt.title("Accuracy")
+    plt.title("Loss")
     plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.ylim(0, 1)
+    plt.ylabel("Loss")
     plt.legend()
 
     buf = io.BytesIO()
