@@ -13,4 +13,4 @@ EXPOSE 5001
 USER root
 
 # CMD tree && sleep 5 && python neural_net_manager.py
-CMD tree && sleep 5 && uvicorn endpoints:app --host 0.0.0.0 --port 5001
+CMD tree && sleep 3 && uvicorn endpoints:app --host 0.0.0.0 --port 5001
