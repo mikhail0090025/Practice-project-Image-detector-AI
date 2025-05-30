@@ -76,7 +76,7 @@ async def get_graph_accuracy_endpoint():
     plt.title("Accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
-    plt.ylim(0.5, 1)  # Set y-axis limits to range from 0 to 1
+    plt.ylim(min(min(nnm.all_val_accuracies), min(nnm.all_accuracies)), 1)  # Set y-axis limits to range from 0 to 1
     plt.legend()  # Add a legend to the plot
 
     # Save the plot to a BytesIO buffer as a PNG image
